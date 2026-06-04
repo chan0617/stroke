@@ -1,517 +1,432 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>OGQ 스티커 분할기</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stroke — 스티커 엣지 정리 & 4K 업스케일</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:'Segoe UI','Apple SD Gothic Neo',sans-serif;
-  background:#0d0d14;color:#dde0f0;
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;
-  padding:32px 16px 72px;
-}
-h1{
-  font-size:1.45rem;font-weight:700;margin-bottom:4px;
-  background:linear-gradient(135deg,#a78bfa,#60a5fa);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.sub{font-size:.78rem;color:#555;margin-bottom:26px}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* 업로드 */
-#drop-zone{
-  width:100%;max-width:920px;
-  border:2px dashed #252538;border-radius:14px;
-  padding:44px 24px;text-align:center;cursor:pointer;
-  transition:border-color .2s,background .2s;position:relative;
-}
-#drop-zone:hover,#drop-zone.over{border-color:#a78bfa;background:rgba(167,139,250,.05)}
-#drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-#drop-zone .ico{font-size:2rem;margin-bottom:10px}
-#drop-zone p{font-size:.86rem;color:#888}
-#drop-zone strong{color:#c4b5fd}
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f4f5f7;
+    color: #1a1a2e;
+    min-height: 100vh;
+  }
 
-/* 툴바 */
-#toolbar{
-  width:100%;max-width:920px;margin-top:12px;
-  display:none;align-items:center;gap:8px;flex-wrap:wrap;
-}
-.tb-btn{
-  padding:7px 16px;font-size:.78rem;font-weight:600;
-  border:1px solid #252538;border-radius:8px;
-  background:#141420;color:#aaa;cursor:pointer;transition:all .18s;white-space:nowrap;
-}
-.tb-btn:hover{border-color:#7c3aed;color:#a78bfa}
-.tb-btn.pri{
-  background:linear-gradient(135deg,#7c3aed,#2563eb);
-  border-color:transparent;color:#fff;
-}
-.tb-btn.pri:hover{opacity:.88}
-.tb-btn.pri:disabled{opacity:.35;cursor:not-allowed}
-.tb-sep{width:1px;height:24px;background:#252538;margin:0 4px}
-.tb-info{font-size:.72rem;color:#555;margin-left:auto;white-space:nowrap}
+  header {
+    background: #1a1a2e;
+    color: #fff;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
+  header span { font-size: 0.8rem; color: #aab; }
 
-/* 캔버스 */
-#canvas-wrap{
-  width:100%;max-width:920px;margin-top:10px;display:none;
-  position:relative;
-}
-#main-canvas{
-  display:block;width:100%;border-radius:10px;
-  border:1px solid #1c1c2c;background:#000;
-}
+  main { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
 
-/* 라인 좌표 패널 */
-#line-panel{
-  width:100%;max-width:920px;margin-top:10px;
-  display:none;
-  background:#111120;border-radius:10px;padding:12px 16px;
-  font-size:.72rem;color:#666;font-family:monospace;line-height:2;
-}
-#line-panel .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-#line-panel label{color:#888;margin-right:2px}
-.lv{
-  display:inline-block;min-width:48px;padding:2px 6px;
-  background:#0d0d1a;border:1px solid #1e1e30;border-radius:5px;
-  color:#a78bfa;text-align:right;font-family:monospace;font-size:.72rem;
-  cursor:text;outline:none;
-}
-.lv:focus{border-color:#7c3aed}
+  /* Upload zone */
+  #drop-zone {
+    border: 2.5px dashed #c0c4cc;
+    border-radius: 16px;
+    background: #fff;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  #drop-zone.over { border-color: #4f6ef7; background: #f0f4ff; }
+  #drop-zone .icon { font-size: 3rem; margin-bottom: 12px; }
+  #drop-zone p    { color: #666; font-size: 0.95rem; }
+  #drop-zone b    { color: #4f6ef7; }
+  #file-input { display: none; }
 
-/* 진행 */
-#prog-wrap{width:100%;max-width:920px;margin-top:14px;display:none}
-#prog-bg{height:5px;background:#1a1a2a;border-radius:99px;overflow:hidden}
-#prog-bar{height:100%;width:0%;background:linear-gradient(90deg,#7c3aed,#2563eb);transition:width .1s}
-#prog-lbl{font-size:.7rem;color:#555;margin-top:4px;text-align:right}
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 22px; border-radius: 8px; border: none;
+    font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    transition: opacity .15s, transform .1s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: #4f6ef7; color: #fff; }
+  .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-dl { background: #1a1a2e; color: #fff; font-size: 0.85rem; padding: 8px 16px; }
+  .btn-dl:disabled { opacity: .3; cursor: not-allowed; }
 
-/* 결과 */
-#result-sec{width:100%;max-width:920px;margin-top:24px;display:none}
-#result-sec h2{font-size:.88rem;font-weight:600;color:#c4b5fd;margin-bottom:10px}
-#out-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
-.out-item{
-  position:relative;aspect-ratio:1/1;
-  background:repeating-conic-gradient(#181826 0% 25%,#1e1e2e 0% 50%) 0 0/8px 8px;
-  border-radius:4px;overflow:hidden;cursor:pointer;border:1px solid #1e1e30;
-}
-.out-item:hover{border-color:#7c3aed}
-.out-item img{width:100%;height:100%;object-fit:contain;display:block}
-.out-item .on{position:absolute;bottom:2px;right:3px;font-size:8px;color:rgba(255,255,255,.35)}
-.out-item .sz{position:absolute;top:2px;left:3px;font-size:7px;color:rgba(255,255,255,.3)}
+  #process-wrap {
+    display: flex; align-items: center; gap: 16px;
+    margin-top: 20px;
+  }
+  #progress-wrap {
+    display: none; flex: 1;
+    background: #e8eaf0; border-radius: 999px; height: 8px; overflow: hidden;
+  }
+  #progress-bar {
+    height: 100%; width: 0%; background: #4f6ef7;
+    border-radius: 999px; transition: width .25s ease;
+  }
+  #status-msg { font-size: 0.85rem; color: #666; min-width: 160px; }
 
-#dl-btn{
-  margin-top:10px;width:100%;padding:11px;
-  font-size:.86rem;font-weight:600;border:none;border-radius:10px;
-  background:linear-gradient(135deg,#059669,#0891b2);color:#fff;
-  cursor:pointer;transition:opacity .2s;
-}
-#dl-btn:hover{opacity:.87}
-#dl-btn:disabled{opacity:.35;cursor:not-allowed}
+  /* Results */
+  #results { display: none; margin-top: 40px; }
+  #results > h2 { font-size: 1rem; font-weight: 700; margin-bottom: 18px; color: #444; }
 
-/* 로그 */
-#log{
-  width:100%;max-width:920px;margin-top:10px;
-  background:#070710;border-radius:8px;padding:10px 14px;
-  font-size:.7rem;color:#555;font-family:monospace;
-  line-height:1.8;display:none;max-height:200px;overflow-y:auto;white-space:pre;
-}
-.ok{color:#34d399}.er{color:#f87171}.inf{color:#60a5fa}
+  .result-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  }
+  @media (max-width: 640px) { .result-grid { grid-template-columns: 1fr; } }
+
+  .result-card {
+    background: #fff; border-radius: 14px;
+    overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.07);
+  }
+  .card-title {
+    padding: 14px 18px 0;
+    font-size: 0.9rem; font-weight: 700; color: #1a1a2e;
+  }
+  .canvas-wrap {
+    background-image:
+      linear-gradient(45deg, #ccc 25%, transparent 25%),
+      linear-gradient(-45deg, #ccc 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #ccc 75%),
+      linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    background-color: #e8e8e8;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 220px; padding: 12px;
+    margin-top: 12px;
+  }
+  .result-card canvas { max-width: 100%; max-height: 340px; border-radius: 4px; }
+  .result-footer {
+    padding: 12px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; flex-wrap: wrap;
+  }
+  .result-info { font-size: 0.78rem; color: #888; }
 </style>
 </head>
 <body>
 
-<h1>OGQ 스티커 분할기</h1>
-<p class="sub">가이드선을 드래그해서 24칸을 직접 맞추고 → 원본 화질 그대로 PNG 저장</p>
+<header>
+  <h1>✏ Stroke</h1>
+  <span>스티커 엣지 정리 &amp; 4K 업스케일 — 100% 브라우저 처리 · 외부 API 없음 · 무료</span>
+</header>
 
-<div id="drop-zone">
-  <input type="file" id="file-in" accept="image/*"/>
-  <div class="ico">🖼️</div>
-  <p><strong>합본 이미지를 드래그</strong>하거나 클릭해서 업로드</p>
-  <p style="margin-top:6px;font-size:.72rem;color:#444">6열 × 4행 · 24개 스티커 · 원본 화질 crop</p>
-</div>
+<main>
 
-<!-- 툴바 -->
-<div id="toolbar">
-  <button class="tb-btn" id="btn-fit"  onclick="autoFit()">⊞ 자동 균등 분할</button>
-  <button class="tb-btn" id="btn-top"  onclick="alignTop()">↑ 여백 자동 제거</button>
-  <div class="tb-sep"></div>
-  <button class="tb-btn" id="btn-reset" onclick="resetGrid()">↺ 초기화</button>
-  <div class="tb-sep"></div>
-  <button class="tb-btn pri" id="run-btn" onclick="splitStickers()">✂️ 분할 저장</button>
-  <span class="tb-info" id="tb-info">—</span>
-</div>
-
-<!-- 캔버스 -->
-<div id="canvas-wrap"><canvas id="main-canvas"></canvas></div>
-
-<!-- 라인 좌표 직접 입력 -->
-<div id="line-panel">
-  <div class="row">
-    <label>열 경계 (px):</label>
-    <span id="v-inputs"></span>
+  <div id="drop-zone">
+    <div class="icon">🖼️</div>
+    <p><b>PNG 파일을 드래그</b>하거나 클릭해서 업로드</p>
+    <p style="margin-top:6px;font-size:.82rem;color:#aaa">투명 배경(RGBA) PNG 스티커</p>
+    <input type="file" id="file-input" accept=".png,image/png">
   </div>
-  <div class="row" style="margin-top:6px">
-    <label>행 경계 (px):</label>
-    <span id="h-inputs"></span>
+
+  <div id="process-wrap">
+    <button class="btn btn-primary" id="process-btn" disabled>⚡ 처리 시작</button>
+    <div id="progress-wrap">
+      <div id="progress-bar"></div>
+    </div>
+    <span id="status-msg"></span>
   </div>
-</div>
 
-<div id="prog-wrap">
-  <div id="prog-bg"><div id="prog-bar"></div></div>
-  <div id="prog-lbl">0 / 24</div>
-</div>
+  <section id="results">
+    <h2>결과</h2>
+    <div class="result-grid">
 
-<div id="result-sec">
-  <h2>분할 결과 — 클릭하면 개별 다운로드</h2>
-  <div id="out-grid"></div>
-  <button id="dl-btn">⬇️ 전체 ZIP 다운로드 (sticker_01 ~ sticker_24)</button>
-</div>
-<div id="log"></div>
+      <div class="result-card">
+        <div class="card-title">정리된 스티커 (아웃라인 적용)</div>
+        <div class="canvas-wrap"><canvas id="canvas-cleaned"></canvas></div>
+        <div class="result-footer">
+          <span class="result-info" id="info-cleaned">—</span>
+          <button class="btn btn-dl" id="dl-cleaned" disabled>⬇ 다운로드</button>
+        </div>
+      </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+      <div class="result-card">
+        <div class="card-title">4K 업스케일</div>
+        <div class="canvas-wrap"><canvas id="canvas-4k"></canvas></div>
+        <div class="result-footer">
+          <span class="result-info" id="info-4k">—</span>
+          <button class="btn btn-dl" id="dl-4k" disabled>⬇ 다운로드</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
 <script>
-(()=>{
-'use strict';
+/* ═══════════════════════════════════════════════════════════════════════════
+   IMAGE PROCESSING
+   100% local — Canvas API only. No network requests. No API keys. No fees.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-// ── 상수 ──────────────────────────────────────────────────
-const COLS=6, ROWS=4, TOTAL=24;
-const HIT=8;       // 선 히트 범위 (canvas 내부 px)
-const MIN_GAP=10;  // 선 간 최소 간격 (원본 px)
-
-// ── 상태 ──────────────────────────────────────────────────
-let origImg=null, srcCvs=null, dispScale=1;
-// 경계선 (원본 이미지 픽셀)
-// vLines: 7개 [L, c1..c5, R]  hLines: 5개 [T, r1..r3, B]
-let vLines=[], hLines=[];
-let dragLine=null;   // {type:'v'|'h', idx}
-let resultBlobs=[];
-
-// ── DOM ───────────────────────────────────────────────────
-const dropZone  = document.getElementById('drop-zone');
-const fileIn    = document.getElementById('file-in');
-const toolbar   = document.getElementById('toolbar');
-const runBtn    = document.getElementById('run-btn');
-const tbInfo    = document.getElementById('tb-info');
-const canvasWrap= document.getElementById('canvas-wrap');
-const cvs       = document.getElementById('main-canvas');
-const ctx       = cvs.getContext('2d');
-const linePanel = document.getElementById('line-panel');
-const vInputs   = document.getElementById('v-inputs');
-const hInputs   = document.getElementById('h-inputs');
-const progWrap  = document.getElementById('prog-wrap');
-const progBar   = document.getElementById('prog-bar');
-const progLbl   = document.getElementById('prog-lbl');
-const resultSec = document.getElementById('result-sec');
-const outGrid   = document.getElementById('out-grid');
-const dlBtn     = document.getElementById('dl-btn');
-const logEl     = document.getElementById('log');
-
-// ── 파일 로드 ─────────────────────────────────────────────
-dropZone.addEventListener('dragover', e=>{e.preventDefault();dropZone.classList.add('over')});
-dropZone.addEventListener('dragleave', ()=>dropZone.classList.remove('over'));
-dropZone.addEventListener('drop', e=>{e.preventDefault();dropZone.classList.remove('over');loadFile(e.dataTransfer.files[0])});
-fileIn.addEventListener('change', ()=>{if(fileIn.files[0])loadFile(fileIn.files[0])});
-
-function loadFile(file){
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const img=new Image();
-    img.onload=()=>{
-      origImg=img;
-      srcCvs=document.createElement('canvas');
-      srcCvs.width=img.naturalWidth; srcCvs.height=img.naturalHeight;
-      srcCvs.getContext('2d').drawImage(img,0,0);
-      initCanvas();
-      autoFit();
-      toolbar.style.display     ='flex';
-      canvasWrap.style.display  ='block';
-      linePanel.style.display   ='block';
-      resultSec.style.display   ='none';
-      logEl.style.display       ='none';
-      outGrid.innerHTML='';
-      resultBlobs=[];
-    };
-    img.src=ev.target.result;
-  };
-  reader.readAsDataURL(file);
+function setProgress(pct, msg) {
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('status-msg').textContent = msg;
 }
 
-// ── 캔버스 초기화 ─────────────────────────────────────────
-function initCanvas(){
-  const maxW=Math.min(920, window.innerWidth-32);
-  dispScale=maxW/origImg.naturalWidth;
-  cvs.width =Math.round(origImg.naturalWidth *dispScale);
-  cvs.height=Math.round(origImg.naturalHeight*dispScale);
-}
-window.addEventListener('resize',()=>{ if(origImg){initCanvas();render();} });
+function tick() { return new Promise(r => setTimeout(r, 20)); }
 
-// ── 그리드 초기화 (전체 이미지 균등 분할) ────────────────
-window.autoFit=function(){
-  const w=origImg.naturalWidth, h=origImg.naturalHeight;
-  vLines=Array.from({length:COLS+1},(_,i)=>Math.round(i*w/COLS));
-  hLines=Array.from({length:ROWS+1},(_,i)=>Math.round(i*h/ROWS));
-  render(); updateInputs(); updateInfo();
-};
-
-// 상단/하단 여백 자동 제거: 이미지 중앙 기준 가로비율 맞추기
-window.alignTop=function(){
-  if(!origImg) return;
-  const w=origImg.naturalWidth, h=origImg.naturalHeight;
-  // 현재 가로 전체 폭 기준으로 세로 비율(4440:2560) 높이 추정
-  const bw=vLines[COLS]-vLines[0];
-  const bh=Math.round(bw*2560/4440);
-  const top=Math.round((h-bh)/2);
-  const bot=top+bh;
-  hLines=Array.from({length:ROWS+1},(_,i)=>Math.round(top+i*bh/ROWS));
-  render(); updateInputs(); updateInfo();
-};
-
-window.resetGrid=function(){ autoFit(); };
-
-// ── 좌표 변환 ─────────────────────────────────────────────
-function getMouse(e){
-  const r=cvs.getBoundingClientRect();
-  const cx=(e.clientX-r.left)*(cvs.width/r.width);
-  const cy=(e.clientY-r.top )*(cvs.height/r.height);
-  return { cx, cy, ox:cx/dispScale, oy:cy/dispScale };
-}
-
-// ── 드래그 히트 탐지 ──────────────────────────────────────
-function findHit(cx,cy){
-  // 수직선 우선
-  for(let i=0;i<vLines.length;i++){
-    if(Math.abs(cx-vLines[i]*dispScale)<=HIT) return {type:'v',idx:i};
-  }
-  for(let i=0;i<hLines.length;i++){
-    if(Math.abs(cy-hLines[i]*dispScale)<=HIT) return {type:'h',idx:i};
-  }
-  return null;
-}
-
-// ── 마우스 이벤트 ─────────────────────────────────────────
-cvs.addEventListener('mousedown', e=>{
-  dragLine=findHit(...Object.values(getMouse(e)).slice(0,2));
-  if(dragLine) e.preventDefault();
-});
-
-cvs.addEventListener('mousemove', e=>{
-  const {cx,cy,ox,oy}=getMouse(e);
-  if(dragLine){
-    if(dragLine.type==='v'){
-      const prev=vLines[dragLine.idx-1]??-Infinity;
-      const next=vLines[dragLine.idx+1]??Infinity;
-      vLines[dragLine.idx]=Math.round(clamp(ox, prev+MIN_GAP, next-MIN_GAP));
-    } else {
-      const prev=hLines[dragLine.idx-1]??-Infinity;
-      const next=hLines[dragLine.idx+1]??Infinity;
-      hLines[dragLine.idx]=Math.round(clamp(oy, prev+MIN_GAP, next-MIN_GAP));
-    }
-    render(); updateInputs(); updateInfo();
-    return;
-  }
-  // 커서 변경
-  const h=findHit(cx,cy);
-  cvs.style.cursor = h ? (h.type==='v'?'ew-resize':'ns-resize') : 'default';
-});
-
-window.addEventListener('mouseup',()=>{ dragLine=null; });
-
-// 터치
-cvs.addEventListener('touchstart', e=>{ cvs.dispatchEvent(new MouseEvent('mousedown',toME(e))); },{passive:false});
-cvs.addEventListener('touchmove',  e=>{ e.preventDefault(); cvs.dispatchEvent(new MouseEvent('mousemove',toME(e))); },{passive:false});
-cvs.addEventListener('touchend',   ()=>cvs.dispatchEvent(new MouseEvent('mouseup')));
-function toME(e){ const t=e.touches[0]; return {clientX:t.clientX,clientY:t.clientY,bubbles:true}; }
-
-// ── 렌더링 ────────────────────────────────────────────────
-function render(){
-  ctx.clearRect(0,0,cvs.width,cvs.height);
-  ctx.drawImage(origImg,0,0,cvs.width,cvs.height);
-  if(!vLines.length||!hLines.length) return;
-
-  const toC=v=>v*dispScale;
-
-  // 바깥 어둡게 (4면 마스크)
-  const lx=toC(vLines[0]),      rx=toC(vLines[COLS]);
-  const ty=toC(hLines[0]),      by=toC(hLines[ROWS]);
-  ctx.fillStyle='rgba(0,0,0,0.48)';
-  ctx.fillRect(0,0,cvs.width,ty);
-  ctx.fillRect(0,ty,lx,by-ty);
-  ctx.fillRect(rx,ty,cvs.width-rx,by-ty);
-  ctx.fillRect(0,by,cvs.width,cvs.height-by);
-
-  // 바깥 테두리
-  ctx.strokeStyle='#a78bfa';ctx.lineWidth=2;ctx.setLineDash([]);
-  ctx.strokeRect(lx,ty,rx-lx,by-ty);
-
-  // 내부 구분선 (수직)
-  ctx.strokeStyle='rgba(167,139,250,0.5)';ctx.lineWidth=1;ctx.setLineDash([5,3]);
-  for(let i=1;i<COLS;i++){
-    const x=toC(vLines[i]);
-    ctx.beginPath();ctx.moveTo(x,ty);ctx.lineTo(x,by);ctx.stroke();
-  }
-  // 내부 구분선 (수평)
-  for(let i=1;i<ROWS;i++){
-    const y=toC(hLines[i]);
-    ctx.beginPath();ctx.moveTo(lx,y);ctx.lineTo(rx,y);ctx.stroke();
-  }
-  ctx.setLineDash([]);
-
-  // 셀 번호
-  const cellFontSize=Math.max(10,Math.min(18,(rx-lx)/COLS/3));
-  ctx.font=`bold ${cellFontSize}px monospace`;
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  for(let row=0;row<ROWS;row++){
-    for(let col=0;col<COLS;col++){
-      const idx=row*COLS+col+1;
-      const cx=(toC(vLines[col])+toC(vLines[col+1]))/2;
-      const cy=(toC(hLines[row])+toC(hLines[row+1]))/2;
-      ctx.fillStyle='rgba(0,0,0,0.45)';
-      ctx.fillText(String(idx).padStart(2,'0'),cx+1,cy+1);
-      ctx.fillStyle='rgba(255,255,255,0.7)';
-      ctx.fillText(String(idx).padStart(2,'0'),cx,cy);
+// ── 1. Remove green (#00FF7F) colour fringe ─────────────────────────────────
+function removeFringe(imageData) {
+  const d = new Uint8ClampedArray(imageData.data);
+  for (let i = 0; i < d.length; i += 4) {
+    const r = d[i], g = d[i+1], b = d[i+2], a = d[i+3];
+    if (a === 0) continue;
+    const maxRB  = Math.max(r, b);
+    const excess = Math.max(0, g - maxRB);
+    if (excess === 0) continue;
+    const isEdge = a > 1 && a < 240;
+    const despill = Math.min(excess / 128, 1);
+    d[i+1] = Math.round(g - excess * (isEdge ? despill : 0.4));
+    if (isEdge && g > 180 && g > r * 1.8 && g > b * 1.4) {
+      d[i+3] = Math.round(a * (1 - Math.min(excess / 200, 1) * 0.85));
     }
   }
-
-  // 핸들 표시 (드래그 가능한 선 위)
-  ctx.fillStyle='#a78bfa';
-  const HL=4;
-  vLines.forEach(v=>{
-    const x=toC(v);
-    ctx.fillRect(x-HL/2, ty-HL, HL, HL*2);
-    ctx.fillRect(x-HL/2, by-HL, HL, HL*2);
-  });
-  hLines.forEach(h=>{
-    const y=toC(h);
-    ctx.fillRect(lx-HL, y-HL/2, HL*2, HL);
-    ctx.fillRect(rx-HL, y-HL/2, HL*2, HL);
-  });
+  return new ImageData(d, imageData.width, imageData.height);
 }
 
-// ── 좌표 입력 패널 ────────────────────────────────────────
-function updateInputs(){
-  vInputs.innerHTML='';
-  hInputs.innerHTML='';
-  vLines.forEach((v,i)=>{
-    const span=makeInput(v, newVal=>{
-      vLines[i]=clamp(Math.round(newVal),
-        (vLines[i-1]??0)+MIN_GAP,
-        (vLines[i+1]??origImg.naturalWidth)-MIN_GAP);
-      render(); updateInputs(); updateInfo();
-    });
-    vInputs.appendChild(span);
-    if(i<vLines.length-1){const s=document.createElement('span');s.textContent=' · ';s.style.color='#333';vInputs.appendChild(s);}
-  });
-  hLines.forEach((h,i)=>{
-    const span=makeInput(h, newVal=>{
-      hLines[i]=clamp(Math.round(newVal),
-        (hLines[i-1]??0)+MIN_GAP,
-        (hLines[i+1]??origImg.naturalHeight)-MIN_GAP);
-      render(); updateInputs(); updateInfo();
-    });
-    hInputs.appendChild(span);
-    if(i<hLines.length-1){const s=document.createElement('span');s.textContent=' · ';s.style.color='#333';hInputs.appendChild(s);}
-  });
+// ── 2. Smooth jagged alpha (box blur on alpha channel only) ─────────────────
+function smoothAlpha(imageData) {
+  const { width: w, height: h, data } = imageData;
+  const out = new Uint8ClampedArray(data);
+  const R = 1;
+  for (let y = R; y < h - R; y++) {
+    for (let x = R; x < w - R; x++) {
+      const a = data[(y * w + x) * 4 + 3];
+      if (a === 0 || a === 255) continue;
+      let sum = 0, cnt = 0;
+      for (let dy = -R; dy <= R; dy++)
+        for (let dx = -R; dx <= R; dx++) {
+          sum += data[((y+dy)*w+(x+dx))*4+3];
+          cnt++;
+        }
+      out[(y * w + x) * 4 + 3] = Math.round(sum / cnt);
+    }
+  }
+  return new ImageData(out, w, h);
 }
 
-function makeInput(val, onChange){
-  const el=document.createElement('span');
-  el.className='lv'; el.contentEditable='true';
-  el.textContent=String(Math.round(val));
-  el.addEventListener('blur', ()=>onChange(parseFloat(el.textContent)||0));
-  el.addEventListener('keydown', e=>{if(e.key==='Enter'){e.preventDefault();el.blur();}});
-  return el;
+// ── 3. Outline: dilate binary mask, paint black → white → character ─────────
+function dilateMask(binary, w, h, radius) {
+  const r   = Math.ceil(radius);
+  const out = new Uint8Array(w * h);
+  // Circular kernel offsets (precomputed)
+  const offs = [];
+  for (let dy = -r; dy <= r; dy++)
+    for (let dx = -r; dx <= r; dx++)
+      if (dx*dx + dy*dy <= radius * radius + 0.5)
+        offs.push(dy * w + dx);
+
+  for (let y = r; y < h - r; y++) {
+    for (let x = r; x < w - r; x++) {
+      const idx = y * w + x;
+      if (binary[idx]) { out[idx] = 1; continue; }
+      for (const off of offs)
+        if (binary[idx + off]) { out[idx] = 1; break; }
+    }
+  }
+  // Borders: copy binary directly
+  for (let i = 0; i < w * h; i++)
+    if (binary[i]) out[i] = 1;
+  return out;
 }
 
-// ── 정보 표시 ─────────────────────────────────────────────
-function updateInfo(){
-  if(!vLines.length||!hLines.length){tbInfo.textContent='—';return;}
-  const w=Math.round(vLines[COLS]-vLines[0]);
-  const h=Math.round(hLines[ROWS]-hLines[0]);
-  const cw=Math.round(w/COLS), ch=Math.round(h/ROWS);
-  tbInfo.textContent=`전체 ${w}×${h}px · 셀 ${cw}×${ch}px`;
+function addOutline(imageData, whitePx = 2.0, blackPx = 1.5) {
+  const { width: w, height: h, data } = imageData;
+  const totalPx = whitePx + blackPx;
+
+  const binary = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++)
+    binary[i] = data[i * 4 + 3] > 30 ? 1 : 0;
+
+  const blackDil = dilateMask(binary, w, h, totalPx);
+  const whiteDil = dilateMask(binary, w, h, whitePx);
+
+  const out = new Uint8ClampedArray(w * h * 4);
+
+  for (let i = 0; i < w * h; i++) {
+    const p = i * 4;
+    if (binary[i]) {
+      out[p] = data[p]; out[p+1] = data[p+1];
+      out[p+2] = data[p+2]; out[p+3] = data[p+3];
+    } else if (whiteDil[i]) {
+      out[p] = out[p+1] = out[p+2] = 255; out[p+3] = 255;
+    } else if (blackDil[i]) {
+      out[p] = out[p+1] = out[p+2] = 0; out[p+3] = 255;
+    }
+  }
+  return new ImageData(out, w, h);
 }
 
-// ── 분할 실행 ─────────────────────────────────────────────
-window.splitStickers=async function(){
-  if(!origImg||!vLines.length||!hLines.length) return;
-  logEl.style.display='block'; logEl.innerHTML='';
-  addLog('inf',`▶ 분할 시작 — 원본: ${origImg.naturalWidth}×${origImg.naturalHeight}px`);
-  addLog('inf',`  열 경계: [${vLines.map(v=>Math.round(v)).join(', ')}]`);
-  addLog('inf',`  행 경계: [${hLines.map(h=>Math.round(h)).join(', ')}]\n`);
+// ── 4. 4K upscale via canvas (hardware-accelerated) ─────────────────────────
+function upscaleTo4K(imageData) {
+  const { width, height } = imageData;
+  const MAX = 3840;
+  if (Math.max(width, height) >= MAX) return imageData;
 
-  runBtn.disabled=true;
-  progWrap.style.display='block';
-  progBar.style.width='0%';
-  resultSec.style.display='block';
-  outGrid.innerHTML='';
-  resultBlobs=[];
+  const scale = MAX / Math.max(width, height);
+  const nw = Math.round(width * scale);
+  const nh = Math.round(height * scale);
 
-  let allOk=true;
-  for(let i=0;i<TOTAL;i++){
-    const row=Math.floor(i/COLS), col=i%COLS;
-    const sx=Math.round(vLines[col]),   sy=Math.round(hLines[row]);
-    const sw=Math.round(vLines[col+1]-vLines[col]);
-    const sh=Math.round(hLines[row+1]-hLines[row]);
+  const src = document.createElement('canvas');
+  src.width = width; src.height = height;
+  src.getContext('2d').putImageData(imageData, 0, 0);
 
-    // 원본 srcCvs에서 직접 crop (리사이즈 없음)
-    const cell=document.createElement('canvas');
-    cell.width=sw; cell.height=sh;
-    cell.getContext('2d').drawImage(srcCvs, sx, sy, sw, sh, 0, 0, sw, sh);
+  const dst = document.createElement('canvas');
+  dst.width = nw; dst.height = nh;
+  const ctx = dst.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(src, 0, 0, nw, nh);
+  return ctx.getImageData(0, 0, nw, nh);
+}
 
-    const fname=`sticker_${String(i+1).padStart(2,'0')}.png`;
-    addLog('ok',`  ${fname}  ${sw}×${sh}px  (원본좌표 x=${sx} y=${sy})`);
-    if(sw<=0||sh<=0) allOk=false;
+// ── 5. Sharpen (3×3 unsharp — skipped for very large images) ────────────────
+function sharpen(imageData) {
+  const { width: w, height: h, data } = imageData;
+  if (w > 1500) return imageData; // skip on 4K — already sharp from LANCZOS-quality canvas
+  const out = new Uint8ClampedArray(data);
+  const k = [0, -0.25, 0, -0.25, 2, -0.25, 0, -0.25, 0];
+  for (let y = 1; y < h-1; y++)
+    for (let x = 1; x < w-1; x++) {
+      const p = (y * w + x) * 4;
+      if (data[p+3] < 10) continue;
+      for (let c = 0; c < 3; c++) {
+        let v = 0;
+        for (let ky = -1; ky <= 1; ky++)
+          for (let kx = -1; kx <= 1; kx++)
+            v += data[((y+ky)*w+(x+kx))*4+c] * k[(ky+1)*3+(kx+1)];
+        out[p+c] = Math.max(0, Math.min(255, v));
+      }
+    }
+  return new ImageData(out, w, h);
+}
 
-    const blob=await toBlob(cell);
-    resultBlobs.push({fname,blob});
+// ── Download helper ─────────────────────────────────────────────────────────
+function downloadCanvas(canvas, filename) {
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = filename;
+  a.click();
+}
 
-    // 결과 그리드
-    const div=document.createElement('div'); div.className='out-item'; div.title=fname;
-    const imgEl=document.createElement('img'); imgEl.src=cell.toDataURL('image/png');
-    const numEl=document.createElement('span'); numEl.className='on';
-    numEl.textContent=String(i+1).padStart(2,'0');
-    const szEl=document.createElement('span'); szEl.className='sz';
-    szEl.textContent=`${sw}×${sh}`;
-    div.appendChild(imgEl); div.appendChild(numEl); div.appendChild(szEl);
-    div.addEventListener('click',()=>downloadBlob(blob,fname));
-    outGrid.appendChild(div);
+function sizeInfo(imageData) {
+  return `${imageData.width} × ${imageData.height} px`;
+}
 
-    progBar.style.width=`${((i+1)/TOTAL)*100}%`;
-    progLbl.textContent=`${i+1} / ${TOTAL}`;
+/* ═══════════════════════════════════════════════════════════════════════════
+   FULL PIPELINE
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function runPipeline(file) {
+  const btn = document.getElementById('process-btn');
+  btn.disabled = true;
+  document.getElementById('progress-wrap').style.display = 'flex';
+
+  let t0 = Date.now();
+
+  try {
+    setProgress(5, '이미지 로딩…');
     await tick();
+
+    const bitmap = await createImageBitmap(file);
+    const tmp = document.createElement('canvas');
+    tmp.width = bitmap.width; tmp.height = bitmap.height;
+    tmp.getContext('2d').drawImage(bitmap, 0, 0);
+    let id = tmp.getContext('2d').getImageData(0, 0, tmp.width, tmp.height);
+
+    setProgress(18, '컬러 프린지 제거…');
+    await tick();
+    id = removeFringe(id);
+
+    setProgress(32, '알파 엣지 스무딩…');
+    await tick();
+    id = smoothAlpha(id);
+
+    setProgress(50, '아웃라인 추가 중…');
+    await tick();
+    id = addOutline(id, 2.0, 1.5);
+
+    // Show cleaned result
+    const cc = document.getElementById('canvas-cleaned');
+    cc.width = id.width; cc.height = id.height;
+    cc.getContext('2d').putImageData(id, 0, 0);
+    document.getElementById('info-cleaned').textContent = sizeInfo(id);
+
+    setProgress(68, '4K 업스케일…');
+    await tick();
+    let id4k = upscaleTo4K(id);
+
+    setProgress(88, '샤프닝…');
+    await tick();
+    id4k = sharpen(id4k);
+
+    // Show 4K result
+    const c4k = document.getElementById('canvas-4k');
+    c4k.width = id4k.width; c4k.height = id4k.height;
+    c4k.getContext('2d').putImageData(id4k, 0, 0);
+
+    const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+    document.getElementById('info-4k').textContent =
+      `${sizeInfo(id4k)}  |  ${elapsed}s`;
+
+    setProgress(100, `완료! (${elapsed}s)`);
+
+    // Wire download buttons
+    const base = file.name.replace(/\.png$/i, '');
+    const dlC = document.getElementById('dl-cleaned');
+    const dl4 = document.getElementById('dl-4k');
+    dlC.disabled = dl4.disabled = false;
+    dlC.onclick = () => downloadCanvas(cc,  `${base}_cleaned.png`);
+    dl4.onclick = () => downloadCanvas(c4k, `${base}_4k.png`);
+
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    setProgress(0, '오류: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.disabled = false;
   }
+}
 
-  addLog(allOk?'ok':'er',`\n${allOk?'✓':'✗'} 완료: ${TOTAL}개 파일 생성`);
-  runBtn.disabled=false;
-};
+/* ═══════════════════════════════════════════════════════════════════════════
+   UI WIRING
+   ═══════════════════════════════════════════════════════════════════════════ */
+let selectedFile = null;
 
-// ── ZIP ───────────────────────────────────────────────────
-dlBtn.addEventListener('click',async()=>{
-  if(!resultBlobs.length) return;
-  dlBtn.disabled=true; dlBtn.textContent='압축 중…';
-  const zip=new JSZip();
-  resultBlobs.forEach(({fname,blob})=>zip.file(fname,blob));
-  const zb=await zip.generateAsync({type:'blob'});
-  downloadBlob(zb,'stickers_ogq.zip');
-  dlBtn.disabled=false; dlBtn.textContent='⬇️ 전체 ZIP 다운로드 (sticker_01 ~ sticker_24)';
+const dropZone   = document.getElementById('drop-zone');
+const fileInput  = document.getElementById('file-input');
+const processBtn = document.getElementById('process-btn');
+
+dropZone.addEventListener('click',     () => fileInput.click());
+dropZone.addEventListener('dragover',  e  => { e.preventDefault(); dropZone.classList.add('over'); });
+dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type === 'image/png') selectFile(f);
+  else alert('PNG 파일만 지원합니다.');
 });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) selectFile(fileInput.files[0]); });
 
-// ── 유틸 ─────────────────────────────────────────────────
-function toBlob(c){return new Promise(r=>c.toBlob(r,'image/png'))}
-function tick(){return new Promise(r=>requestAnimationFrame(r))}
-function clamp(v,a,b){return Math.min(Math.max(v,a),b)}
-function downloadBlob(blob,name){
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download=name; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+function selectFile(f) {
+  selectedFile = f;
+  dropZone.querySelector('p').innerHTML =
+    `<b>${f.name}</b> (${(f.size/1024).toFixed(0)} KB) — 준비 완료`;
+  processBtn.disabled = false;
 }
-function addLog(cls,msg){
-  const s=document.createElement('span');
-  s.className=cls; s.textContent=msg+'\n';
-  logEl.appendChild(s); logEl.scrollTop=logEl.scrollHeight;
-}
-})();
+
+processBtn.addEventListener('click', () => {
+  if (selectedFile) runPipeline(selectedFile);
+});
 </script>
 </body>
 </html>
