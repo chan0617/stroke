@@ -1,1 +1,1 @@
-# OGQ
+# stroke
