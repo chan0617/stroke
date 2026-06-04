@@ -1,0 +1,61 @@
+# ── API keys & secrets (NEVER upload these) ───────────────────────────────────
+.env
+.env.*
+*.env
+.env.local
+.env.production
+.env.development
+
+# Common secret file patterns
+api_key*
+*_api_key*
+*_secret*
+*_token*
+secrets.json
+secrets.yaml
+secrets.yml
+credentials.json
+service_account*.json
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# ── App outputs (generated images — not source code) ─────────────────────────
+output/
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ── Editors / IDEs ────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Gradio temp cache ─────────────────────────────────────────────────────────
+gradio_cached_examples/
+flagged/
