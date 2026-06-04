@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stroke — 스티커 흰색 테두리 & 4K 업스케일</title>
+<title>Stroke — 흰색 테두리 & 4K 업스케일</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -25,9 +25,9 @@ header {
 header h1 { font-size: 1.35rem; font-weight: 700; }
 header span { font-size: 0.78rem; color: #99a; }
 
-main { max-width: 1080px; margin: 0 auto; padding: 28px 20px; }
+main { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
 
-/* ── Upload zone ── */
+/* Upload zone */
 #drop-zone {
   border: 2.5px dashed #c5c9d5;
   border-radius: 14px;
@@ -44,12 +44,11 @@ main { max-width: 1080px; margin: 0 auto; padding: 28px 20px; }
 #drop-zone .sub { margin-top: 6px; font-size: .78rem; color: #aaa; }
 #file-input { display: none; }
 
-/* ── Controls ── */
+/* Controls */
 #controls {
   display: flex; align-items: center; gap: 14px;
   margin-top: 18px; flex-wrap: wrap;
 }
-
 .btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 9px 20px; border-radius: 8px; border: none;
@@ -59,10 +58,20 @@ main { max-width: 1080px; margin: 0 auto; padding: 28px 20px; }
 .btn:active { transform: scale(.97); }
 .btn-primary { background: #5469ff; color: #fff; }
 .btn-primary:disabled { opacity: .4; cursor: not-allowed; transform: none; }
-.btn-sm { background: #1a1a2e; color: #fff; font-size: 0.78rem; padding: 6px 13px; border-radius: 6px; border: none; cursor: pointer; }
+.btn-sm {
+  background: #1a1a2e; color: #fff;
+  font-size: 0.78rem; padding: 6px 13px;
+  border-radius: 6px; border: none; cursor: pointer;
+}
 .btn-sm:disabled { opacity: .3; cursor: not-allowed; }
+.btn-zip {
+  background: #5469ff; color: #fff;
+  font-size: 0.82rem; padding: 7px 16px;
+  border-radius: 7px; border: none; cursor: pointer;
+}
+.btn-zip:disabled { opacity: .3; cursor: not-allowed; }
 
-/* ── Progress ── */
+/* Progress */
 #progress-wrap {
   flex: 1; min-width: 160px;
   background: #e4e7ef; border-radius: 99px; height: 7px;
@@ -71,23 +80,19 @@ main { max-width: 1080px; margin: 0 auto; padding: 28px 20px; }
 #progress-bar {
   height: 100%; width: 0%;
   background: linear-gradient(90deg, #5469ff, #7b8fff);
-  border-radius: 99px; transition: width .25s ease;
+  border-radius: 99px; transition: width .2s ease;
 }
-#status-msg { font-size: .82rem; color: #666; min-width: 170px; }
+#status-msg { font-size: .82rem; color: #666; min-width: 200px; }
 
-/* ── File queue badge ── */
-#queue-info {
-  font-size: .82rem; color: #888;
-  display: none;
-}
-
-/* ── Results ── */
+/* Results */
 #results { margin-top: 36px; display: none; }
-#results h2 { font-size: .95rem; font-weight: 700; color: #555; margin-bottom: 16px; }
-
-#result-list {
-  display: flex; flex-direction: column; gap: 16px;
+#results-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
 }
+#results-header h2 { font-size: .95rem; font-weight: 700; color: #555; }
+
+#result-list { display: flex; flex-direction: column; gap: 16px; }
 
 .result-card {
   background: #fff;
@@ -95,27 +100,18 @@ main { max-width: 1080px; margin: 0 auto; padding: 28px 20px; }
   box-shadow: 0 2px 10px rgba(0,0,0,.06);
   overflow: hidden;
   display: grid;
-  grid-template-columns: auto 1fr 1fr;
-  gap: 0;
+  grid-template-columns: 36px 1fr 1fr;
 }
-@media (max-width: 640px) {
-  .result-card { grid-template-columns: 1fr; }
-}
+@media (max-width: 600px) { .result-card { grid-template-columns: 1fr; } }
 
 .card-label {
-  background: #1a1a2e;
-  color: #fff;
-  padding: 12px 14px;
-  font-size: .75rem;
-  font-weight: 600;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  text-align: center;
-  letter-spacing: .05em;
-  min-width: 36px;
+  background: #1a1a2e; color: #fff;
+  font-size: .7rem; font-weight: 600;
+  writing-mode: vertical-rl; text-align: center;
+  letter-spacing: .05em; padding: 10px 0;
 }
-@media (max-width: 640px) {
-  .card-label { writing-mode: horizontal-tb; padding: 8px 14px; min-width: unset; }
+@media (max-width: 600px) {
+  .card-label { writing-mode: horizontal-tb; padding: 8px 14px; }
 }
 
 .card-panel {
@@ -123,62 +119,67 @@ main { max-width: 1080px; margin: 0 auto; padding: 28px 20px; }
   display: flex; flex-direction: column; gap: 8px;
   border-left: 1px solid #f0f0f0;
 }
-.card-panel:first-of-type { border-left: none; }
-
 .panel-title {
-  font-size: .75rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: .04em;
+  font-size: .72rem; font-weight: 700; color: #999;
+  text-transform: uppercase; letter-spacing: .05em;
 }
 
-/* Checkerboard transparent background */
+/* Checkerboard = transparent bg indicator */
 .preview-wrap {
   background-image:
-    linear-gradient(45deg, #ddd 25%, transparent 25%),
-    linear-gradient(-45deg, #ddd 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #ddd 75%),
-    linear-gradient(-45deg, transparent 75%, #ddd 75%);
+    linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
   background-size: 14px 14px;
   background-position: 0 0, 0 7px, 7px -7px, -7px 0;
-  background-color: #eee;
+  background-color: #e8e8e8;
   border-radius: 6px;
   display: flex; align-items: center; justify-content: center;
-  min-height: 100px; max-height: 200px; overflow: hidden;
+  min-height: 90px; max-height: 220px; overflow: hidden;
 }
-.preview-wrap canvas {
-  max-width: 100%; max-height: 200px; border-radius: 4px;
-}
+.preview-wrap canvas { max-width: 100%; max-height: 220px; border-radius: 4px; }
 
 .card-footer {
   display: flex; align-items: center; justify-content: space-between;
   margin-top: 2px;
 }
-.info-text { font-size: .72rem; color: #aaa; }
+.info-text { font-size: .7rem; color: #bbb; }
+
+.error-card {
+  background: #fff5f5; border-left: 3px solid #f55;
+  border-radius: 8px; padding: 12px 16px;
+  font-size: .82rem; color: #c00;
+}
 </style>
 </head>
 <body>
 
 <header>
   <h1>✏ Stroke</h1>
-  <span>흰색 테두리 + 4K 업스케일 — 브라우저 100% 처리 · 외부 API 없음</span>
+  <span>검정 배경 제거 → 흰색 테두리 8px → 4K 업스케일 &nbsp;|&nbsp; 100% 브라우저 · 외부 API 없음</span>
 </header>
 
 <main>
 
   <div id="drop-zone">
     <div class="icon">🖼️</div>
-    <p><b>PNG 파일을 드래그</b>하거나 클릭해서 업로드</p>
-    <p class="sub">여러 파일 동시 선택 가능 · 투명 배경(RGBA) PNG</p>
-    <input type="file" id="file-input" accept=".png,image/png" multiple>
+    <p><b>PNG / JPG 파일을 드래그</b>하거나 클릭해서 업로드</p>
+    <p class="sub">다중 파일 선택 가능 · 검정 배경 자동 감지 제거</p>
+    <input type="file" id="file-input" accept=".png,.jpg,.jpeg,image/png,image/jpeg" multiple>
   </div>
 
   <div id="controls">
     <button class="btn btn-primary" id="process-btn" disabled>⚡ 처리 시작</button>
     <div id="progress-wrap"><div id="progress-bar"></div></div>
     <span id="status-msg"></span>
-    <span id="queue-info"></span>
   </div>
 
   <section id="results">
-    <h2 id="results-title">결과</h2>
+    <div id="results-header">
+      <h2 id="results-title">결과</h2>
+      <button class="btn-zip" id="dl-zip-btn" disabled>⬇ 전체 ZIP 다운로드</button>
+    </div>
     <div id="result-list"></div>
   </section>
 
@@ -187,54 +188,120 @@ main { max-width: 1080px; margin: 0 auto; padding: 28px 20px; }
 <script>
 /* ════════════════════════════════════════════════════════════════════════════
    PROCESSING — 100% Canvas API · 외부 API 없음 · 무료
+
+   Pipeline (sticker_app.py 와 동일한 로직):
+   Step 1. 검정 배경 제거 (R<30 & G<30 & B<30 → alpha=0) + 1px 페더링
+   Step 2. 알파 엣지 정리 (morphological close → hard threshold >128)
+   Step 3. 흰색 테두리 8px (검정 없음)
+   Step 4. 4K 업스케일 (최장변 3840px) + 언샤프 마스크
    ════════════════════════════════════════════════════════════════════════════ */
 
-const tick = () => new Promise(r => setTimeout(r, 16));
+const tick = (ms = 16) => new Promise(r => setTimeout(r, ms));
 
 function setProgress(pct, msg) {
   document.getElementById('progress-bar').style.width = pct + '%';
   document.getElementById('status-msg').textContent = msg;
 }
 
-// ── 1. 그린 컬러 프린지 제거 (#00FF7F 계열) ──────────────────────────────────
-function removeFringe(imageData) {
-  const d = new Uint8ClampedArray(imageData.data);
-  for (let i = 0; i < d.length; i += 4) {
-    const r = d[i], g = d[i+1], b = d[i+2], a = d[i+3];
-    if (a === 0) continue;
-    const maxRB  = Math.max(r, b);
-    const excess = Math.max(0, g - maxRB);
-    if (excess === 0) continue;
-    const isEdge = a > 1 && a < 240;
-    d[i+1] = Math.round(g - excess * (isEdge ? Math.min(excess/128, 1) : 0.4));
-    if (isEdge && g > 180 && g > r * 1.8 && g > b * 1.4)
-      d[i+3] = Math.round(a * (1 - Math.min(excess/200, 1) * 0.85));
-  }
-  return new ImageData(d, imageData.width, imageData.height);
+// ── Step 1: 검정 배경 제거 ──────────────────────────────────────────────────
+
+function hasRealTransparency(data, total) {
+  // >5% 픽셀이 이미 투명이면 배경 제거 스킵
+  let cnt = 0;
+  for (let i = 3; i < data.length; i += 4)
+    if (data[i] < 10) cnt++;
+  return cnt / total > 0.05;
 }
 
-// ── 2. 알파 엣지 스무딩 ────────────────────────────────────────────────────────
-function smoothAlpha(imageData) {
+function removeBlackBackground(imageData) {
   const { width: w, height: h, data } = imageData;
-  const out = new Uint8ClampedArray(data);
+  const d = new Uint8ClampedArray(data);
+
+  if (hasRealTransparency(d, w * h)) return new ImageData(d, w, h);
+
+  // Pass 1: 검정 픽셀(R<30, G<30, B<30) → alpha=0
+  const isBlack = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) {
+    const p = i * 4;
+    if (d[p] < 30 && d[p+1] < 30 && d[p+2] < 30) {
+      isBlack[i] = 1;
+      d[p+3] = 0;
+    }
+  }
+
+  // Pass 2: 1px 페더링 — 검정 경계 인접 픽셀 alpha를 살짝 낮춤
+  for (let y = 1; y < h-1; y++) {
+    for (let x = 1; x < w-1; x++) {
+      const idx = y * w + x;
+      if (isBlack[idx]) continue;
+      if (d[idx*4+3] === 0) continue;
+      // 4-방향 중 검정 이웃이 있으면 alpha 부드럽게
+      const hasBlackNeighbor =
+        isBlack[(y-1)*w+x] || isBlack[(y+1)*w+x] ||
+        isBlack[y*w+(x-1)] || isBlack[y*w+(x+1)];
+      if (hasBlackNeighbor) {
+        d[idx*4+3] = Math.round(d[idx*4+3] * 0.75);
+      }
+    }
+  }
+
+  return new ImageData(d, w, h);
+}
+
+// ── Step 2: 알파 엣지 정리 ─────────────────────────────────────────────────
+// morphological close (3×3 박스) → hard threshold >128 → 255
+
+function morphClose(alpha, w, h) {
+  // dilate then erode with 3×3 box
+  const dilated = new Uint8Array(w * h);
+  const result  = new Uint8Array(w * h);
+
+  // Dilate
   for (let y = 1; y < h-1; y++)
     for (let x = 1; x < w-1; x++) {
-      const a = data[(y*w+x)*4+3];
-      if (a === 0 || a === 255) continue;
-      let sum = 0, cnt = 0;
+      let max = 0;
       for (let dy = -1; dy <= 1; dy++)
-        for (let dx = -1; dx <= 1; dx++) {
-          sum += data[((y+dy)*w+(x+dx))*4+3]; cnt++;
-        }
-      out[(y*w+x)*4+3] = Math.round(sum / cnt);
+        for (let dx = -1; dx <= 1; dx++)
+          if (alpha[(y+dy)*w+(x+dx)] > max) max = alpha[(y+dy)*w+(x+dx)];
+      dilated[y*w+x] = max;
     }
-  return new ImageData(out, w, h);
+
+  // Erode
+  for (let y = 1; y < h-1; y++)
+    for (let x = 1; x < w-1; x++) {
+      let min = 255;
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dx = -1; dx <= 1; dx++)
+          if (dilated[(y+dy)*w+(x+dx)] < min) min = dilated[(y+dy)*w+(x+dx)];
+      result[y*w+x] = min;
+    }
+
+  return result;
 }
 
-// ── 3. 원형 커널 팽창 (dilation) ───────────────────────────────────────────────
+function cleanAlphaEdges(imageData) {
+  const { width: w, height: h, data } = imageData;
+
+  // Extract alpha
+  const alpha = new Uint8Array(w * h);
+  for (let i = 0; i < w*h; i++) alpha[i] = data[i*4+3];
+
+  // Morphological close
+  const closed = morphClose(alpha, w, h);
+
+  // Hard threshold: >128 → 255, ≤128 → 0
+  const d = new Uint8ClampedArray(data);
+  for (let i = 0; i < w*h; i++)
+    d[i*4+3] = closed[i] > 128 ? 255 : 0;
+
+  return new ImageData(d, w, h);
+}
+
+// ── Step 3: 흰색 테두리 8px ────────────────────────────────────────────────
+
 function dilateMask(binary, w, h, radius) {
-  const r   = Math.ceil(radius);
-  const out = new Uint8Array(w * h);
+  const r    = Math.ceil(radius);
+  const out  = new Uint8Array(w * h);
   const offs = [];
   for (let dy = -r; dy <= r; dy++)
     for (let dx = -r; dx <= r; dx++)
@@ -252,51 +319,46 @@ function dilateMask(binary, w, h, radius) {
   return out;
 }
 
-// ── 4. 흰색 테두리만 추가 (검정 없음) ─────────────────────────────────────────
-//    outlinePx : 흰색 두께 (기본 3px = 원래 2px + 1px 추가)
-//    Anti-alias : 테두리 바깥쪽 0.8px을 페이드아웃
-function addWhiteOutline(imageData, outlinePx = 3.0) {
+function addWhiteOutline(imageData, outlinePx = 8) {
   const { width: w, height: h, data } = imageData;
 
-  // 바이너리 마스크
   const binary = new Uint8Array(w * h);
   for (let i = 0; i < w*h; i++)
-    binary[i] = data[i*4+3] > 30 ? 1 : 0;
+    binary[i] = data[i*4+3] > 0 ? 1 : 0;
 
-  // 흰색 영역 (hard)
-  const whiteDil = dilateMask(binary, w, h, outlinePx);
-  // 안티앨리어싱 페이드존 (0.8px 더 팽창)
-  const fadeDil  = dilateMask(binary, w, h, outlinePx + 0.8);
+  const dilated = dilateMask(binary, w, h, outlinePx);
 
-  const out = new Uint8ClampedArray(w*h*4);
-
+  const out = new Uint8ClampedArray(w * h * 4);
   for (let i = 0; i < w*h; i++) {
-    const p = i*4;
+    const p = i * 4;
     if (binary[i]) {
-      // 원본 캐릭터 픽셀
+      // 원본 캐릭터
       out[p] = data[p]; out[p+1] = data[p+1];
       out[p+2] = data[p+2]; out[p+3] = data[p+3];
-    } else if (whiteDil[i]) {
-      // 흰색 테두리 (완전 불투명)
-      out[p] = out[p+1] = out[p+2] = 255; out[p+3] = 255;
-    } else if (fadeDil[i]) {
-      // 바깥쪽 안티앨리어싱 — 반투명 흰색으로 자연스럽게 페이드
-      out[p] = out[p+1] = out[p+2] = 255; out[p+3] = 80;
+    } else if (dilated[i]) {
+      // 흰색 테두리 (검정 없음)
+      out[p] = out[p+1] = out[p+2] = 255;
+      out[p+3] = 255;
     }
   }
   return new ImageData(out, w, h);
 }
 
-// ── 5. 4K 업스케일 ─────────────────────────────────────────────────────────────
+// ── Step 4: 4K 업스케일 ────────────────────────────────────────────────────
+
 function upscaleTo4K(imageData) {
   const { width, height } = imageData;
   const MAX = 3840;
   if (Math.max(width, height) >= MAX) return imageData;
+
   const scale = MAX / Math.max(width, height);
-  const nw = Math.round(width * scale), nh = Math.round(height * scale);
+  const nw = Math.round(width * scale);
+  const nh = Math.round(height * scale);
+
   const src = document.createElement('canvas');
   src.width = width; src.height = height;
   src.getContext('2d').putImageData(imageData, 0, 0);
+
   const dst = document.createElement('canvas');
   dst.width = nw; dst.height = nh;
   const ctx = dst.getContext('2d');
@@ -306,8 +368,8 @@ function upscaleTo4K(imageData) {
   return ctx.getImageData(0, 0, nw, nh);
 }
 
-// ── 6. 샤프닝 ──────────────────────────────────────────────────────────────────
-function sharpen(imageData) {
+// 언샤프 마스크 (1800px 이하만)
+function unsharpMask(imageData) {
   const { width: w, height: h, data } = imageData;
   if (w > 1800) return imageData;
   const out = new Uint8ClampedArray(data);
@@ -327,24 +389,30 @@ function sharpen(imageData) {
   return new ImageData(out, w, h);
 }
 
-// ── 다운로드 ────────────────────────────────────────────────────────────────────
-function downloadCanvas(canvas, filename) {
-  const a = document.createElement('a');
-  a.href = canvas.toDataURL('image/png');
-  a.download = filename; a.click();
-}
+// ── 다운로드 & 유틸 ────────────────────────────────────────────────────────
 
-// ── 캔버스에 ImageData 그리기 ──────────────────────────────────────────────────
 function putID(canvas, id) {
   canvas.width = id.width; canvas.height = id.height;
   canvas.getContext('2d').putImageData(id, 0, 0);
 }
 
+function canvasToBlob(canvas) {
+  return new Promise(res => canvas.toBlob(res, 'image/png'));
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
 /* ════════════════════════════════════════════════════════════════════════════
-   단일 파일 처리 → 결과 카드 생성
+   단일 파일 처리
    ════════════════════════════════════════════════════════════════════════════ */
 async function processOne(file, idx, total) {
-  setProgress(0, `처리 중 ${idx+1}/${total} — ${file.name}`);
+  const label = `(${idx+1}/${total}) ${file.name}`;
+  setProgress((idx / total) * 95, `${label} — 로딩…`);
   await tick();
 
   const bitmap = await createImageBitmap(file);
@@ -353,22 +421,20 @@ async function processOne(file, idx, total) {
   tmp.getContext('2d').drawImage(bitmap, 0, 0);
   let id = tmp.getContext('2d').getImageData(0, 0, tmp.width, tmp.height);
 
-  setProgress(15, `프린지 제거… (${idx+1}/${total})`); await tick();
-  id = removeFringe(id);
+  setProgress((idx / total) * 95 + 5,  `${label} — 검정 배경 제거…`); await tick();
+  id = removeBlackBackground(id);
 
-  setProgress(30, `엣지 스무딩… (${idx+1}/${total})`); await tick();
-  id = smoothAlpha(id);
+  setProgress((idx / total) * 95 + 10, `${label} — 알파 엣지 정리…`);  await tick();
+  id = cleanAlphaEdges(id);
 
-  setProgress(48, `흰색 테두리 추가… (${idx+1}/${total})`); await tick();
-  id = addWhiteOutline(id, 3.0);
+  setProgress((idx / total) * 95 + 18, `${label} — 흰색 테두리 8px…`); await tick();
+  id = addWhiteOutline(id, 8);
 
-  setProgress(65, `4K 업스케일… (${idx+1}/${total})`); await tick();
+  setProgress((idx / total) * 95 + 26, `${label} — 4K 업스케일…`);     await tick();
   let id4k = upscaleTo4K(id);
 
-  setProgress(88, `샤프닝… (${idx+1}/${total})`); await tick();
-  id4k = sharpen(id4k);
-
-  setProgress(100, `완료! (${idx+1}/${total})`);
+  setProgress((idx / total) * 95 + 34, `${label} — 언샤프 마스크…`);   await tick();
+  id4k = unsharpMask(id4k);
 
   return { file, id, id4k };
 }
@@ -376,15 +442,22 @@ async function processOne(file, idx, total) {
 /* ════════════════════════════════════════════════════════════════════════════
    결과 카드 렌더
    ════════════════════════════════════════════════════════════════════════════ */
+
+// 전체 ZIP 에 넣을 blob 목록
+const zipEntries = [];
+
 function renderCard(result) {
   const { file, id, id4k } = result;
-  const base = file.name.replace(/\.png$/i, '');
+  const base = file.name.replace(/\.[^.]+$/, '');
 
-  // 캔버스 생성
   const cc = document.createElement('canvas');
   const c4 = document.createElement('canvas');
   putID(cc, id);
   putID(c4, id4k);
+
+  // ZIP용 blob 사전 생성
+  canvasToBlob(cc).then(b => zipEntries.push({ name: `${base}_outline.png`, blob: b }));
+  canvasToBlob(c4).then(b => zipEntries.push({ name: `${base}_4k.png`,      blob: b }));
 
   const card = document.createElement('div');
   card.className = 'result-card';
@@ -392,74 +465,94 @@ function renderCard(result) {
   // 파일명 세로 레이블
   const lbl = document.createElement('div');
   lbl.className = 'card-label';
-  lbl.textContent = file.name.length > 20 ? file.name.slice(0, 18) + '…' : file.name;
+  const shortName = file.name.length > 18 ? file.name.slice(0, 16) + '…' : file.name;
+  lbl.textContent = shortName;
 
-  // 왼쪽 패널 — cleaned
+  // ── 왼쪽: outline ──
   const left = document.createElement('div');
   left.className = 'card-panel';
   left.innerHTML = '<div class="panel-title">흰색 테두리</div>';
-  const lWrap = document.createElement('div'); lWrap.className = 'preview-wrap';
-  lWrap.appendChild(cc); left.appendChild(lWrap);
-  const lFoot = document.createElement('div'); lFoot.className = 'card-footer';
-  lFoot.innerHTML = `<span class="info-text">${id.width}×${id.height}px</span>`;
+
+  const lw = document.createElement('div'); lw.className = 'preview-wrap';
+  lw.appendChild(cc); left.appendChild(lw);
+
+  const lf = document.createElement('div'); lf.className = 'card-footer';
+  lf.innerHTML = `<span class="info-text">${id.width}×${id.height}px</span>`;
   const dlC = document.createElement('button'); dlC.className = 'btn-sm';
   dlC.textContent = '⬇ 다운로드';
-  dlC.onclick = () => downloadCanvas(cc, `${base}_outline.png`);
-  lFoot.appendChild(dlC); left.appendChild(lFoot);
+  dlC.onclick = () => canvasToBlob(cc).then(b => downloadBlob(b, `${base}_outline.png`));
+  lf.appendChild(dlC); left.appendChild(lf);
 
-  // 오른쪽 패널 — 4K
+  // ── 오른쪽: 4K ──
   const right = document.createElement('div');
   right.className = 'card-panel';
   right.innerHTML = '<div class="panel-title">4K 업스케일</div>';
-  const rWrap = document.createElement('div'); rWrap.className = 'preview-wrap';
-  rWrap.appendChild(c4); right.appendChild(rWrap);
-  const rFoot = document.createElement('div'); rFoot.className = 'card-footer';
-  rFoot.innerHTML = `<span class="info-text">${id4k.width}×${id4k.height}px</span>`;
+
+  const rw = document.createElement('div'); rw.className = 'preview-wrap';
+  rw.appendChild(c4); right.appendChild(rw);
+
+  const rf = document.createElement('div'); rf.className = 'card-footer';
+  rf.innerHTML = `<span class="info-text">${id4k.width}×${id4k.height}px</span>`;
   const dlK = document.createElement('button'); dlK.className = 'btn-sm';
   dlK.textContent = '⬇ 다운로드';
-  dlK.onclick = () => downloadCanvas(c4, `${base}_4k.png`);
-  rFoot.appendChild(dlK); right.appendChild(rFoot);
+  dlK.onclick = () => canvasToBlob(c4).then(b => downloadBlob(b, `${base}_4k.png`));
+  rf.appendChild(dlK); right.appendChild(rf);
 
-  card.appendChild(lbl);
-  card.appendChild(left);
-  card.appendChild(right);
+  card.append(lbl, left, right);
   return card;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   ZIP 다운로드 (JSZip 없이 — 개별 파일이 준비되면 직접 zip)
+   브라우저 File System Access API 또는 단순 다중 다운로드로 대체
+   ════════════════════════════════════════════════════════════════════════════ */
+async function downloadZip() {
+  // JSZip 없이: 모든 파일을 순차 다운로드
+  for (const entry of zipEntries) {
+    downloadBlob(entry.blob, entry.name);
+    await tick(300);
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
    전체 파이프라인
    ════════════════════════════════════════════════════════════════════════════ */
 async function runAll(files) {
-  const btn = document.getElementById('process-btn');
-  btn.disabled = true;
-  document.getElementById('progress-wrap').style.display = 'flex';
-
-  const list  = document.getElementById('result-list');
-  const sec   = document.getElementById('results');
+  const btn  = document.getElementById('process-btn');
+  const sec  = document.getElementById('results');
+  const list = document.getElementById('result-list');
   const title = document.getElementById('results-title');
+  const zipBtn = document.getElementById('dl-zip-btn');
+
+  btn.disabled = true;
+  zipBtn.disabled = true;
+  document.getElementById('progress-wrap').style.display = 'flex';
   list.innerHTML = '';
+  zipEntries.length = 0;
   sec.style.display = 'block';
 
   const t0 = Date.now();
 
   for (let i = 0; i < files.length; i++) {
+    title.textContent = `처리 중… (${i+1}/${files.length})`;
     try {
-      title.textContent = `처리 중… (${i+1}/${files.length})`;
       const result = await processOne(files[i], i, files.length);
       list.appendChild(renderCard(result));
       if (i === 0) sec.scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
       const errCard = document.createElement('div');
-      errCard.style.cssText = 'padding:12px 16px;background:#fff3f3;border-radius:10px;color:#c00;font-size:.82rem;';
+      errCard.className = 'error-card';
       errCard.textContent = `❌ ${files[i].name}: ${err.message}`;
       list.appendChild(errCard);
     }
   }
 
   const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+  setProgress(100, `완료! ${files.length}개 처리 (${elapsed}s)`);
   title.textContent = `결과 — ${files.length}개 완료 (${elapsed}s)`;
-  setProgress(100, `전체 완료 (${elapsed}s)`);
+
   btn.disabled = false;
+  zipBtn.disabled = false;
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -467,41 +560,38 @@ async function runAll(files) {
    ════════════════════════════════════════════════════════════════════════════ */
 let selectedFiles = [];
 
-const dropZone  = document.getElementById('drop-zone');
-const fileInput = document.getElementById('file-input');
+const dropZone   = document.getElementById('drop-zone');
+const fileInput  = document.getElementById('file-input');
 const processBtn = document.getElementById('process-btn');
-const queueInfo  = document.getElementById('queue-info');
 
 dropZone.addEventListener('click', () => fileInput.click());
-
-dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('over'); });
+dropZone.addEventListener('dragover',  e  => { e.preventDefault(); dropZone.classList.add('over'); });
 dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('over'));
 dropZone.addEventListener('drop', e => {
   e.preventDefault(); dropZone.classList.remove('over');
-  const pngs = [...e.dataTransfer.files].filter(f => f.type === 'image/png');
-  if (pngs.length) selectFiles(pngs);
-  else alert('PNG 파일만 지원합니다.');
+  const files = [...e.dataTransfer.files].filter(f =>
+    f.type === 'image/png' || f.type === 'image/jpeg'
+  );
+  if (files.length) selectFiles(files);
+  else alert('PNG 또는 JPG 파일만 지원합니다.');
 });
-
 fileInput.addEventListener('change', () => {
-  const pngs = [...fileInput.files].filter(f => f.type === 'image/png');
-  if (pngs.length) selectFiles(pngs);
+  if (fileInput.files.length) selectFiles([...fileInput.files]);
 });
 
 function selectFiles(files) {
   selectedFiles = files;
-  const names = files.length === 1
-    ? `<b>${files[0].name}</b>`
-    : `<b>${files.length}개 파일</b> 선택됨`;
-  dropZone.querySelector('p').innerHTML = `${names} — 준비 완료`;
-  queueInfo.style.display = 'inline';
-  queueInfo.textContent = files.map(f => f.name).join(', ').slice(0, 80) + (files.length > 3 ? '…' : '');
+  dropZone.querySelector('p').innerHTML = files.length === 1
+    ? `<b>${files[0].name}</b> — 준비 완료`
+    : `<b>${files.length}개 파일</b> 선택됨 — 준비 완료`;
   processBtn.disabled = false;
 }
 
 processBtn.addEventListener('click', () => {
   if (selectedFiles.length) runAll(selectedFiles);
 });
+
+document.getElementById('dl-zip-btn').addEventListener('click', downloadZip);
 </script>
 </body>
 </html>
